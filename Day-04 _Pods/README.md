@@ -27,6 +27,33 @@ Pods are useful for:
 
 
 ## How to Create a Pod?
+Creating a Pod - Imperative Way
+
+Besides using YAML files (declarative approach), Kubernetes also allows us to create resources like Pods imperatively using the kubectl command directly from the terminal.
+Syntax:
+
+kubectl run <pod-name> --image=<container-image> --port=<port>
+
+Example:
+
+To create a Pod running an nginx container using the imperative approach, run:
+
+kubectl run my-pod --image=nginx:latest --port=80
+
+What happens here?
+
+    kubectl run: The command to create a Pod.
+
+    my-pod: The name of the Pod.
+
+    --image=nginx:latest: The container image used.
+
+    --port=80: The port exposed by the container.
+
+Verify the Pod:
+
+kubectl get pods
+
 
 In Kubernetes, Pods are created using YAML files, which define the desired state of the application. A basic Pod specification in a YAML file looks like this:
 
