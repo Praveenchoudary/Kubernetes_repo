@@ -20,6 +20,12 @@ Pods are useful for:
 2. **Container Networking**: Pods simplify networking and expose only a single IP address for all containers inside the Pod.
 3. **Scaling**: Pods can be scaled easily in Kubernetes, ensuring optimal resource utilization and efficient container management.
 
+   ![image](https://github.com/user-attachments/assets/f572f682-ef40-420f-a733-46a0408551a2)
+
+   ![image](https://github.com/user-attachments/assets/f4509280-87ec-4881-89e4-45e30dc0633e)
+
+
+
 ## How to Create a Pod?
 
 In Kubernetes, Pods are created using YAML files, which define the desired state of the application. A basic Pod specification in a YAML file looks like this:
