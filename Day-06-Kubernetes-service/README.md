@@ -82,52 +82,6 @@ http://<load-balancer-dns>
 
     Replace <load-balancer-dns> with the actual DNS provided by your cloud provider.
 
-🧪 Example YAMLs
-ClusterIP Service
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-app-clusterip
-spec:
-  selector:
-    app: my-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: ClusterIP
-
-NodePort Service
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-app-nodeport
-spec:
-  selector:
-    app: my-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-      nodePort: 31404
-  type: NodePort
-
-LoadBalancer Service
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-app-loadbalancer
-spec:
-  selector:
-    app: my-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: LoadBalancer
 
 📊 Summary Table
 Service Type	External Access	Use Case	Cloud Required	Notes
