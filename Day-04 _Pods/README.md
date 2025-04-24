@@ -61,3 +61,26 @@ In the above YAML:
     The container runs the nginx:latest image.
 
     The container exposes port 80 for web traffic.
+In the above YAML:
+
+    A single container (nginx) is defined.
+
+    The container runs the nginx:latest image.
+
+    The container exposes port 80 for web traffic.
+
+Creating the Pod
+
+    Save the YAML file as pod.yaml.
+
+    Run the following command to create the Pod:
+
+kubectl apply -f pod.yaml
+
+    To verify that the Pod is created, run:
+
+kubectl get pods
+
+    You can check the logs of the Pod by using:
+
+kubectl logs my-pod
