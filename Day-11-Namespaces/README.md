@@ -91,3 +91,41 @@ When a Kubernetes cluster is provisioned, the following namespaces are created b
 
 ```bash
 kubectl create namespace dev
+
+Or using YAML:
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+
+Apply it:
+
+kubectl apply -f namespace.yaml
+
+Create an Object in a Namespace
+
+kubectl apply -f deployment.yaml -n dev
+
+Or include it in the YAML:
+
+metadata:
+  name: my-app
+  namespace: dev
+
+View Namespaces
+
+kubectl get namespaces
+kubectl describe namespace kube-system
+
+Delete a Namespace
+
+kubectl delete namespace dev
+
+🧾 Best Practices
+
+    Always explicitly set namespace in your YAMLs for clarity.
+
+    Avoid deploying custom resources in kube-system or kube-public.
+
+    Use logical naming conventions (team-a, dev-env, monitoring, etc.).
