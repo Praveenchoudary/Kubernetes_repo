@@ -50,7 +50,7 @@ Example: Using Init Containers
 Here’s an example demonstrating the use of an init container with Nginx:
 
 Create a file named nginx-init.yaml:
-
+  ---
 apiVersion: v1
 kind: Pod
 metadata:
@@ -76,7 +76,7 @@ spec:
   volumes:
     - name: data
       emptyDir: {}
-
+    ---
 Explanation:
 
     An init container runs first and writes an HTML file into a shared volume (emptyDir).
