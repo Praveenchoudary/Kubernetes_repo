@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod          # Pod name is 'nginx-pod'
+  labels:
+    app: nginx             # Labeling it with 'app: nginx'
+spec:
+  containers:
+  - name: nginx-container   # MAIN application container
+    image: nginx:latest     # Pulls latest nginx image
+    ports:
+      - containerPort: 80   # Exposes port 80 (nginx default)
+    volumeMounts:
+      - name: logs
+        mountPath: /var/log/nginx    # Mounts volume inside container to save logs
+  - name: sidecar-container  # SIDECAR container (helper)
+    image: busybox           # Using lightweight busybox image
+    command: ["/bin/sh"]
+    args: ["-c", "tail -f /var/log/nginx/access.log"]
+    volumeMounts:
+      - name: logs
+        mountPath: /var/log/nginx     # Same volume mounted as main container
+  volumes:
+    - name: logs
+      emptyDir: {}    # Shared EMPTYDIR volume (empty storage for both containers)
