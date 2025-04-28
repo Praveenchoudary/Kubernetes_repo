@@ -29,3 +29,19 @@ They automate repetitive tasks within Kubernetes clusters, allowing for streamli
 
     📦 Job History Limits
     Control the number of successful and failed Job completions retained by a CronJob, managing resource usage and storage requirements.
+
+    🔵 What is "Job History Limit" in a Kubernetes CronJob?
+
+When a CronJob runs, it creates Jobs.
+Each Job creates a Pod that does the actual work.
+
+Now, after many runs, old Jobs can accumulate and waste memory and disk.
+
+👉 Job History Limit controls how many old Jobs Kubernetes should keep.
+
+There are two types of Job history limits:
+Setting	Meaning
+successfulJobsHistoryLimit	How many successful Jobs to keep.
+failedJobsHistoryLimit	How many failed Jobs to keep.
+
+If a Job is older than the limit, Kubernetes will delete it automatically.
