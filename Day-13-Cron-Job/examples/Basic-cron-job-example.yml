@@ -1,0 +1,15 @@
+apiVersion: batch/v1  # Specifies the API version for CronJob resource.
+kind: CronJob  # Defines the type of Kubernetes resource — CronJob.
+metadata:
+  name: basic-cronjob  # The name of the CronJob resource.
+spec:
+  schedule: "*/1 * * * *"  # Cron schedule expression to run the job every 1 minute. Format: minute hour day month day-of-week.
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: basic-container  # The name of the container inside the Pod.
+            image: busybox  # Uses the busybox image for the container (a lightweight image for simple tasks).
+            command: ["echo", "Hello from the basic CronJob"]  # The command to run inside the container; prints a message.
+          restartPolicy: Never  # Tells Kubernetes not to restart the Pod if it finishes or fails.
