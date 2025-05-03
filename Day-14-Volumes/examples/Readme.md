@@ -2,8 +2,8 @@
 
 Kubernetes Volumes are 🔑 essential for managing persistent data. They allow stateful applications to survive pod restarts, enable data sharing between containers, and ensure proper storage lifecycles within a Kubernetes cluster.
 1️⃣ Persistent Volumes (PV)
-
 📌 Definition:
+
 A Persistent Volume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically by Kubernetes using Storage Classes.
 🧾 Key Attributes:
 
@@ -20,8 +20,9 @@ A Persistent Volume (PV) is a piece of storage in the cluster that has been prov
     🏷 StorageClassName: Links PV to a Storage Class
 
     ♻️ Reclaim Policy: Retain, Delete, or Recycle
-   ------------------------------------------------------------
+
 📄 Example: Manual PV
+'''
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -35,10 +36,10 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /mnt/data
-   --------------------------------------------------------------------------
+...
 2️⃣ Persistent Volume Claims (PVC)
-
 📌 Definition:
+
 A Persistent Volume Claim (PVC) is a request for storage by a user or pod. It abstracts the provisioning details and simplifies storage access.
 🧾 Key Attributes:
 
@@ -49,7 +50,7 @@ A Persistent Volume Claim (PVC) is a request for storage by a user or pod. It ab
     🏷 StorageClassName – determines the backend storage type
 
 📄 Example: PVC
-
+'''
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -62,10 +63,10 @@ spec:
       storage: 5Gi
   storageClassName: standard
   volumeMode: Filesystem
-
+...
 3️⃣ Storage Classes (SC)
-
 📌 Definition:
+
 A Storage Class provides a way for administrators to describe the "classes" of storage they offer. It’s key to enabling dynamic provisioning.
 🧾 Key Attributes:
 
@@ -78,7 +79,7 @@ A Storage Class provides a way for administrators to describe the "classes" of s
     🧲 Volume Binding Mode
 
 📄 Example: Storage Class
-
+'''
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -88,7 +89,7 @@ parameters:
   type: gp2
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
-
+...
 4️⃣ Provisioning of PersistentVolumes
 
 Kubernetes supports two main types of provisioning:
@@ -96,9 +97,8 @@ Kubernetes supports two main types of provisioning:
 
 🧑‍🔧 Administrator manually creates PVs ahead of time.
 📌 Steps:
-
-    Create PV
-
+➤ Create PV
+'''
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -116,11 +116,11 @@ spec:
     volumeHandle: <id>
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
-
+...
 kubectl apply -f static-pv.yaml
 
-    Create PVC
-
+➤ Create PVC
+'''
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -132,11 +132,11 @@ spec:
     requests:
       storage: 1Gi
   volumeMode: Filesystem
-
+...
 kubectl apply -f static-pvc.yaml
 
-    Deploy App Using Volume
-
+➤ Deploy App Using Volume
+'''
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -162,10 +162,10 @@ spec:
         - name: data-volume
           persistentVolumeClaim:
             claimName: static-claim
-
+...
 kubectl apply -f deployment.yaml
 
-    Verify:
+✅ Verify:
 
 kubectl get pvc,pv,pods
 
@@ -173,9 +173,8 @@ kubectl get pvc,pv,pods
 
 💡 Kubernetes automatically creates a PV when a PVC requests it using a StorageClass.
 📌 Steps:
-
-    Create Storage Class
-
+➤ Create Storage Class
+'''
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -184,11 +183,11 @@ provisioner: dobs.csi.digitalocean.com
 reclaimPolicy: Retain
 volumeBindingMode: Immediate
 allowVolumeExpansion: true
-
+...
 kubectl apply -f my-storage-class.yaml
 
-    Create PVC
-
+➤ Create PVC
+'''
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -201,11 +200,11 @@ spec:
     requests:
       storage: 1Gi
   volumeMode: Filesystem
-
+...
 kubectl apply -f my-dynamic-pvc.yaml
 
-    Deploy App
-
+➤ Deploy App
+'''
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -231,10 +230,10 @@ spec:
         - name: data-volume
           persistentVolumeClaim:
             claimName: myclaim
-
+...
 kubectl apply -f deployment.yaml
 
-    Verify:
+✅ Verify:
 
 kubectl get po,pvc,sc,pv
 
