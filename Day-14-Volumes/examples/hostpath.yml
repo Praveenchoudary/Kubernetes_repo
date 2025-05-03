@@ -19,12 +19,21 @@ spec:
           volumeMounts:
             - name: myapp
               mountPath: "/opt/jenkins"
+            - name: hostapp
+              mountPath: "/etc/hostpath"
         - name: cont2
           image: ubuntu
           command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
           volumeMounts:
             - name: myapp
               mountPath: "/etc/kubernetes"
+            - name: hostapp
+              mountPath: "/etc/hostpath"
       volumes:
         - name: myapp
           emptyDir: {}
+        - name: hostapp
+          hostPath:
+            path: /path/on/host/machine  # Change this to the desired directory on the host machine
+            type: Directory  # The type can be Directory, File, or Socket, depending on your use case
+
