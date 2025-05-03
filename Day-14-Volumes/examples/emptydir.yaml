@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: cont1
+          image: nginx
+          command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
+          volumeMounts:
+            - name: myapp
+              mountPath: "/opt/jenkins"
+        - name: cont2
+          image: ubuntu
+          command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
+          volumeMounts:
+            - name: myapp
+              mountPath: "/etc/kubernetes"
+      volumes:
+        - name: myapp
+          emptyDir: {}
