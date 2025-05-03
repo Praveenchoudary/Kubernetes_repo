@@ -20,7 +20,7 @@ A Persistent Volume (PV) is a piece of storage in the cluster that has been prov
     🏷 StorageClassName: Links PV to a Storage Class
 
     ♻️ Reclaim Policy: Retain, Delete, or Recycle
-   -
+   ------------------------------------------------------------
 📄 Example: Manual PV
 apiVersion: v1
 kind: PersistentVolume
@@ -35,7 +35,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /mnt/data
-   -
+   --------------------------------------------------------------------------
 2️⃣ Persistent Volume Claims (PVC)
 
 📌 Definition:
