@@ -1,0 +1,168 @@
+
+# 🚀 Kubernetes Multi-Node Cluster Setup using `kubeadm` on Ubuntu 24.04
+
+This guide helps you set up a **multi-node Kubernetes cluster** using `kubeadm`, `containerd`, and **Ubuntu 24.04**.
+
+## 🧱 Architecture
+
+| Role   | Description        | Nodes       |
+|--------|--------------------|-------------|
+| Master | Control Plane Node | 1 node      |
+| Worker | App/Pod Nodes      | 1+ nodes    |
+
+---
+
+## 📋 Overview of Steps
+
+| Step | Description                         | Applies To       |
+|------|-------------------------------------|------------------|
+| 1️⃣   | System prerequisites                | All nodes        |
+| 2️⃣   | Install and configure containerd    | All nodes        |
+| 3️⃣   | Install Kubernetes tools            | All nodes        |
+| 4️⃣   | Initialize Kubernetes cluster       | Master node      |
+| 5️⃣   | Install Pod Network (Flannel)       | Master node      |
+| 6️⃣   | Join workers to the cluster         | Worker nodes     |
+| 7️⃣   | Verify cluster status               | Master node      |
+
+---
+
+## 1️⃣ System Prerequisites (All Nodes)
+
+### 🚫 Disable Swap
+```bash
+sudo swapoff -a
+sudo sed -i '/ swap / s/^/#/' /etc/fstab
+````
+
+### 🧩 Load Kernel Modules
+
+```bash
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+sudo tee /etc/modules-load.d/k8s.conf <<EOF
+overlay
+br_netfilter
+EOF
+```
+
+### 🔧 Configure Sysctl
+
+```bash
+sudo tee /etc/sysctl.d/k8s.conf <<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+sudo sysctl --system
+```
+
+---
+
+## 2️⃣ Install containerd (All Nodes)
+
+### 📦 Install containerd
+
+```bash
+sudo apt update && sudo apt install -y containerd
+```
+
+### ⚙️ Configure containerd
+
+```bash
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml
+
+# Enable systemd cgroup driver
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+
+sudo systemctl restart containerd
+sudo systemctl enable containerd
+```
+
+---
+
+## 3️⃣ Install Kubernetes Tools (All Nodes)
+
+### 📥 Add Kubernetes Repository
+
+```bash
+sudo apt install -y apt-transport-https ca-certificates curl gpg
+
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" \
+  | sudo tee /etc/apt/sources.list.d/kubernetes.list
+```
+
+### 🚀 Install kubeadm, kubelet, kubectl
+
+```bash
+sudo apt update
+sudo apt install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+```
+
+---
+
+## 4️⃣ Initialize Cluster (Master Node Only)
+
+### 🧭 Initialize
+
+```bash
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+```
+
+### 🧑‍💻 Set up kubectl for the master
+
+```bash
+mkdir -p $HOME/.kube
+sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+---
+
+## 5️⃣ Install Pod Network (Flannel) 🌐
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+```
+
+---
+
+## 6️⃣ Join Worker Nodes 🔗
+
+Run on each **worker node**, using the join command from the master:
+
+```bash
+kubeadm join <MASTER-IP>:6443 --token <TOKEN> --discovery-token-ca-cert-hash sha256:<HASH>
+```
+
+> Replace `<MASTER-IP>`, `<TOKEN>`, and `<HASH>` with actual values from:
+>
+> ```bash
+> kubeadm token create --print-join-command
+> ```
+
+---
+
+## 7️⃣ Verify the Cluster ✅
+
+```bash
+kubectl get nodes
+```
+
+Expected:
+
+```
+NAME         STATUS   ROLES           AGE   VERSION
+master       Ready    control-plane   5m    v1.29.x
+worker-1     Ready    <none>          2m    v1.29.x
+```
+
+---
+
+
