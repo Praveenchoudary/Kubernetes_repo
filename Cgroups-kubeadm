@@ -84,46 +84,5 @@ sudo systemctl start kubelet
 kubectl uncordon <node-name>
 ```
 
-### ⚠️ Note:
 
-* Only update one node at a time to avoid downtime.
-* Make sure your workloads are rescheduled correctly before moving to the next node.
 
----
-
-## 🔍 Check Current Configuration
-
-```bash
-# Check kubelet config
-cat /var/lib/kubelet/config.yaml | grep cgroupDriver
-
-# Check containerd config (if applicable)
-grep SystemdCgroup /etc/containerd/config.toml
-```
-
----
-
-## 📎 Additional Tips
-
-* You can check certs and cluster health after migration using:
-
-  ```bash
-  kubeadm certs check-expiration
-  kubectl get nodes
-  ```
-
-* If you want to keep using `cgroupfs`, explicitly define it in both kubelet and runtime configs to avoid automatic migration.
-
----
-
-## 📚 References
-
-* [Kubernetes Container Runtimes](https://kubernetes.io/docs/setup/production-environment/container-runtimes/)
-* [Kubeadm cgroup driver config](https://kubernetes.io/docs/setup/production-environment/container-runtimes/#cgroup-drivers)
-
----
-
-```
-
-Let me know if you want this added to a GitHub repo format or adjusted for a specific runtime like Docker or containerd.
-```
