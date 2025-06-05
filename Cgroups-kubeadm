@@ -1,0 +1,129 @@
+
+# 🛠️ Configuring the cgroup Driver in Kubernetes (kubeadm Clusters)
+
+This guide explains how to configure the **Kubelet's cgroup driver** to match the container runtime's cgroup driver (`systemd` is recommended), especially for clusters initialized with `kubeadm`.
+
+---
+
+## 📌 Why It Matters
+
+Kubelet and container runtimes (like Docker or containerd) use **cgroup drivers** to manage resources such as CPU and memory.  
+To ensure proper functioning and avoid issues, **both must use the same cgroup driver**.
+
+- `systemd` is recommended for kubeadm-based clusters.
+- `cgroupfs` is still supported but not preferred.
+
+---
+
+## ✅ Initial Setup with systemd (Recommended)
+
+1. **Create a kubeadm configuration file:**
+
+```yaml
+# kubeadm-config.yaml
+kind: ClusterConfiguration
+apiVersion: kubeadm.k8s.io/v1beta3
+kubernetesVersion: v1.21.0
+---
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+cgroupDriver: systemd
+````
+
+2. **Initialize the cluster:**
+
+```bash
+kubeadm init --config kubeadm-config.yaml
+```
+
+This sets both the kubelet and container runtime to use the `systemd` cgroup driver.
+
+---
+
+## 🔄 Migrating an Existing Cluster (cgroupfs → systemd)
+
+If your current setup uses `cgroupfs`, follow the steps below to switch to `systemd`.
+
+### Step 1: Edit the Kubelet ConfigMap
+
+```bash
+kubectl edit cm kubelet-config -n kube-system
+```
+
+Add or update this field under the `kubelet:` section:
+
+```yaml
+cgroupDriver: systemd
+```
+
+### Step 2: Update Each Node
+
+For every node, perform the following **one at a time**:
+
+```bash
+# Drain the node
+kubectl drain <node-name> --ignore-daemonsets
+
+# Stop kubelet and container runtime
+sudo systemctl stop kubelet
+sudo systemctl stop containerd    # or docker
+
+# Update container runtime to use systemd (example for containerd)
+sudo nano /etc/containerd/config.toml
+# Set: SystemdCgroup = true
+sudo systemctl restart containerd
+
+# Update kubelet config
+sudo nano /var/lib/kubelet/config.yaml
+# Add or edit: cgroupDriver: systemd
+
+# Start kubelet
+sudo systemctl start kubelet
+
+# Uncordon the node
+kubectl uncordon <node-name>
+```
+
+### ⚠️ Note:
+
+* Only update one node at a time to avoid downtime.
+* Make sure your workloads are rescheduled correctly before moving to the next node.
+
+---
+
+## 🔍 Check Current Configuration
+
+```bash
+# Check kubelet config
+cat /var/lib/kubelet/config.yaml | grep cgroupDriver
+
+# Check containerd config (if applicable)
+grep SystemdCgroup /etc/containerd/config.toml
+```
+
+---
+
+## 📎 Additional Tips
+
+* You can check certs and cluster health after migration using:
+
+  ```bash
+  kubeadm certs check-expiration
+  kubectl get nodes
+  ```
+
+* If you want to keep using `cgroupfs`, explicitly define it in both kubelet and runtime configs to avoid automatic migration.
+
+---
+
+## 📚 References
+
+* [Kubernetes Container Runtimes](https://kubernetes.io/docs/setup/production-environment/container-runtimes/)
+* [Kubeadm cgroup driver config](https://kubernetes.io/docs/setup/production-environment/container-runtimes/#cgroup-drivers)
+
+---
+
+```
+
+Let me know if you want this added to a GitHub repo format or adjusted for a specific runtime like Docker or containerd.
+```
