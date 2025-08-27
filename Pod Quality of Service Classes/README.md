@@ -108,7 +108,10 @@ spec:
 🟢 Lowest priority
 🟢 First to be killed when node has pressure
 
+<img width="1203" height="434" alt="image" src="https://github.com/user-attachments/assets/81e46c13-192f-4238-bbe2-5ab1157b638d" />
+
 ---
+
 
 ## 🔍 Checking QoS Class
 
@@ -123,6 +126,7 @@ Possible outputs:
 * `Guaranteed`
 * `Burstable`
 * `BestEffort`
+  
 
 ---
 
