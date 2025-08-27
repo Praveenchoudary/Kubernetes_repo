@@ -183,7 +183,3 @@ kubectl delete pod <pod-name> --grace-period=30
 
 ---
 
-
-If you want, I can now **package all YAML files in a ready-to-clone GitHub repo structure** with this README so it’s completely ready for push.
-
-Do you want me to do that?
