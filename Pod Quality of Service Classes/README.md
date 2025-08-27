@@ -78,6 +78,9 @@ spec:
 ⚡ Can burst to 1 CPU + 512Mi RAM
 ⚡ Evicted **after BestEffort, before Guaranteed**
 
+<img width="1203" height="434" alt="image" src="https://github.com/user-attachments/assets/3e3fa4f1-2bf5-46fc-8ff0-4de154787c4b" />
+
+
 ---
 
 ## 🔹 3. BestEffort QoS 🟢
