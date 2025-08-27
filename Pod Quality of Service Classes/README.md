@@ -126,7 +126,10 @@ Possible outputs:
 * `Guaranteed`
 * `Burstable`
 * `BestEffort`
-  
+
+  Example:  I kept pressure on the nodes by increase the stress At this time my two pods Burstable and Besteffort went down and only Guratted is running
+
+  <img width="1226" height="170" alt="image" src="https://github.com/user-attachments/assets/b07fa3bc-ccb4-43f9-a494-e24abc2aadfd" />
 
 ---
 
