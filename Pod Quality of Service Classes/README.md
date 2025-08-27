@@ -41,6 +41,8 @@ spec:
 ✅ Highest priority
 ✅ Last to be evicted
 
+<img width="1203" height="434" alt="image" src="https://github.com/user-attachments/assets/83d4fb6b-ff2f-4418-8a8a-58b82491d4c9" />
+
 ---
 
 ## 🔹 2. Burstable QoS ⚡
