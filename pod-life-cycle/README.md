@@ -1,6 +1,4 @@
-<img width="633" height="425" alt="image" src="https://github.com/user-attachments/assets/2707f7c6-a91c-4740-a914-ccd6cac64a5a" />
-
-Sure! Here’s a **complete GitHub `README.md`** with emojis, brief explanations, and references to all the YAML files. You can copy this directly into your repo.
+  <img width="633" height="425" alt="image" src="https://github.com/user-attachments/assets/2707f7c6-a91c-4740-a914-ccd6cac64a5a" />
 
 ---
 
@@ -26,7 +24,6 @@ Pods are the smallest deployable units in Kubernetes. Each Pod goes through seve
 
 ---
 
-## 📂 YAML Examples
 
 ### 1️⃣ Pending Pod
 
