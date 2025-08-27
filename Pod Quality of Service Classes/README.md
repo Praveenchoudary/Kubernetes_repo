@@ -27,7 +27,7 @@ metadata:
 spec:
   containers:
   - name: payment-api
-    image: mybank/payment:1.0
+    image: nginx
     resources:
       requests:
         cpu: "1000m"
@@ -62,7 +62,7 @@ metadata:
 spec:
   containers:
   - name: frontend
-    image: myshop/frontend:2.0
+    image: httpd
     resources:
       requests:
         cpu: "500m"
@@ -96,7 +96,7 @@ metadata:
 spec:
   containers:
   - name: logger
-    image: mycompany/log-agent:latest
+    image: nginx
 ```
 
 🟢 Runs only if free resources exist
