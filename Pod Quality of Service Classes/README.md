@@ -129,8 +129,3 @@ Possible outputs:
 | ⚡ Burstable   | Reserved seat in train 🚆  | Web apps, APIs                      | Medium                |
 | 🟢 BestEffort | Standby passenger 🧳       | Logs, batch jobs                    | First                 |
 
-
----
-
-Would you like me to also **create separate YAML files (`guaranteed.yaml`, `burstable.yaml`, `besteffort.yaml`)** and show how to structure them inside a GitHub repo 📂?
-```
