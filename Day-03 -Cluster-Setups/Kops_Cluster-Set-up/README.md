@@ -1,78 +1,106 @@
-# Kops Cluster Setup on AWS - praveens.online
 
-This guide provides a step-by-step process to set up a Kubernetes cluster using **Kops** on AWS with the domain **praveens.online**. Follow these instructions to create and configure your Kubernetes cluster on AWS.
+````markdown
+# 🌐 Kubernetes Cluster Setup on AWS with Kops - `praveens.online`
+
+This repository provides a step-by-step guide to set up a **Kubernetes Cluster** using **Kops** on **AWS** with the domain **praveens.online**.  
 
 ---
 
-## Prerequisites
+## ✅ Prerequisites
 
-Ensure you have the following tools installed:
+Make sure the following tools are installed on your system:
 
-- **AWS CLI**: To interact with AWS services.
-- **kubectl**: To manage Kubernetes clusters.
-- **Kops**: To create and manage Kubernetes clusters on AWS.
+- ⚡ **AWS CLI** – To interact with AWS services.  
+- 🐳 **kubectl** – To manage Kubernetes clusters.  
+- ☸️ **Kops** – To create and manage Kubernetes clusters on AWS.  
 
-### Installation Steps:
+---
 
-1. **Install AWS CLI**:
-   ```bash
-   sudo apt update
-   sudo apt install -y awscli
+## 🔧 Installation Steps
 
-    Install kubectl:
+### 1️⃣ Install AWS CLI
+```bash
+sudo apt update
+sudo apt install -y awscli
+````
 
+### 2️⃣ Install kubectl
+
+```bash
 sudo apt install -y kubectl
+```
 
-Install Kops:
+### 3️⃣ Install Kops
 
-    curl -LO https://github.com/kubernetes/kops/releases/download/v1.28.0/kops-linux-amd64
-    chmod +x kops-linux-amd64
-    sudo mv kops-linux-amd64 /usr/local/bin/kops
+```bash
+curl -LO https://github.com/kubernetes/kops/releases/download/v1.28.0/kops-linux-amd64
+chmod +x kops-linux-amd64
+sudo mv kops-linux-amd64 /usr/local/bin/kops
+```
 
-Step 1: Configure AWS CLI
+---
 
-Run the following command to configure AWS CLI:
+## ⚙️ Step 1: Configure AWS CLI
 
+Run:
+
+```bash
 aws configure
+```
 
-You will be prompted to enter your AWS Access Key ID, AWS Secret Access Key, Region, and Output format (e.g., json).
-Step 2: Set Up DNS with Route 53
+Provide your:
 
-    Log in to the AWS Console and navigate to Route 53.
+* 🔑 **AWS Access Key ID**
+* 🔐 **AWS Secret Access Key**
+* 🌍 **Region** (e.g., `us-east-1`)
+* 📄 **Output format** (e.g., `json`)
 
-    Create a Public Hosted Zone for praveens.online.
+---
 
-    Update your domain registrar (e.g., GoDaddy) with the name servers provided by AWS Route 53.
+## 🌍 Step 2: Set Up DNS with Route 53
 
-Step 3: Create an S3 Bucket for Kops State Store
+1. Go to **AWS Console → Route 53**.
+2. Create a **Public Hosted Zone** for `praveens.online`.
+3. Update your **domain registrar (GoDaddy)** with the **name servers** from Route 53.
 
-Kops requires an S3 bucket to store the cluster state. Run the following commands to create the bucket and enable versioning:
+---
 
+## 🗄️ Step 3: Create S3 Bucket for Kops State
+
+```bash
 aws s3api create-bucket --bucket kops-state-praveens-online --region us-east-1
 aws s3api put-bucket-versioning --bucket kops-state-praveens-online --versioning-configuration Status=Enabled
+```
 
-Step 4: Generate SSH Key Pair
+This bucket will store the cluster state.
 
-Generate an SSH key pair to access the Kubernetes nodes:
+---
 
+## 🔑 Step 4: Generate SSH Key Pair
+
+```bash
 ssh-keygen -t rsa -b 4096
+```
 
-Press Enter to accept the default file location and create the SSH key. This key will be used for node access.
-Step 5: Set Environment Variables
+👉 Press **Enter** to accept the default path (`~/.ssh/id_rsa`).
 
-Set environment variables to simplify the process. Run the following commands:
+---
 
+## 🌐 Step 5: Set Environment Variables
+
+```bash
 export KOPS_STATE_STORE=s3://kops-state-praveens-online
 export NAME=praveens.online
+```
 
-    KOPS_STATE_STORE: Specifies where the cluster state is stored (S3 bucket).
+* `KOPS_STATE_STORE` → Path to S3 bucket where Kops stores cluster state.
+* `NAME` → Domain name (`praveens.online`).
 
-    NAME: Your domain name (praveens.online).
+---
 
-Step 6: Create the Cluster
+## ☸️ Step 6: Create the Cluster
 
-Use kops to create the cluster. Run this command:
-
+```bash
 kops create cluster \
   --name=${NAME} \
   --cloud=aws \
@@ -82,36 +110,37 @@ kops create cluster \
   --node-size=t3.medium \
   --node-count=2 \
   --ssh-public-key=~/.ssh/id_rsa.pub
+```
 
-Explanation of parameters:
+### ⚡ Explanation:
 
-    --name=${NAME}: The name of the cluster, based on your domain name (praveens.online).
+* `--name=${NAME}` → Cluster name (domain).
+* `--cloud=aws` → Cloud provider.
+* `--zones=us-east-1a` → Availability Zone.
+* `--dns-zone=${NAME}` → Route 53 DNS zone.
+* `--master-size` → Instance type for master node.
+* `--node-size` → Instance type for worker nodes.
+* `--node-count=2` → Number of worker nodes.
+* `--ssh-public-key` → Public SSH key path.
 
-    --cloud=aws: Specifies the cloud provider (AWS).
+---
 
-    --zones=us-east-1a: Availability zones for the cluster.
+## 🚀 Step 7: Apply Cluster Configuration
 
-    --dns-zone=${NAME}: The Route 53 DNS zone for your domain.
-
-    --master-size=t3.medium: EC2 instance type for the Kubernetes master node.
-
-    --node-size=t3.medium: EC2 instance type for the worker nodes.
-
-    --node-count=2: Number of worker nodes.
-
-    --ssh-public-key=~/.ssh/id_rsa.pub: Path to your SSH public key for accessing the nodes.
-
-Step 7: Apply the Cluster Configuration
-
-Run the following command to apply the cluster configuration and start provisioning:
-
+```bash
 kops update cluster --name=${NAME} --yes
+```
 
-The --yes flag automatically applies the configuration.
-Step 8: Validate the Cluster
+✅ The `--yes` flag automatically provisions resources.
 
-To ensure the cluster is set up correctly, run the following command:
+---
 
+## 🔍 Step 8: Validate the Cluster
+
+```bash
 kops validate cluster --name=${NAME}
+```
 
-This command checks whether the cluster is valid, and all nodes are running.
+This will check whether all nodes are up and running 🎉.
+
+---
