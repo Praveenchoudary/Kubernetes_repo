@@ -1,0 +1,136 @@
+
+````markdown
+# 🚀 Kubernetes Pod QoS (Quality of Service)  
+
+Kubernetes uses **Quality of Service (QoS) classes** to decide how Pods get resources and which Pods are **evicted first** when nodes run out of CPU/Memory.  
+
+There are **3 QoS classes**:  
+- ✅ **Guaranteed**  
+- ⚡ **Burstable**  
+- 🟢 **BestEffort**  
+
+---
+
+## 🔹 1. Guaranteed QoS ✅  
+👉 Like a **confirmed flight ticket ✈️** – nobody can take your seat.  
+
+A Pod is **Guaranteed** if:  
+- Every container has CPU & Memory **requests = limits**.  
+
+📌 **Use Case:** Critical apps (e.g., payment services, databases).  
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: payment-service
+spec:
+  containers:
+  - name: payment-api
+    image: mybank/payment:1.0
+    resources:
+      requests:
+        cpu: "1000m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "512Mi"
+````
+
+✅ Always gets resources
+✅ Highest priority
+✅ Last to be evicted
+
+---
+
+## 🔹 2. Burstable QoS ⚡
+
+👉 Like a **train with a reserved seat 🚆** – you have a guaranteed spot, but can also use extra space if free.
+
+A Pod is **Burstable** if:
+
+* At least one container has requests set.
+* Requests ≠ Limits.
+
+📌 **Use Case:** Web servers, APIs that need baseline resources but handle bursts.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-app
+spec:
+  containers:
+  - name: frontend
+    image: myshop/frontend:2.0
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "256Mi"
+      limits:
+        cpu: "1"
+        memory: "512Mi"
+```
+
+⚡ Gets minimum 0.5 CPU + 256Mi RAM
+⚡ Can burst to 1 CPU + 512Mi RAM
+⚡ Evicted **after BestEffort, before Guaranteed**
+
+---
+
+## 🔹 3. BestEffort QoS 🟢
+
+👉 Like a **standby passenger 🧳** – you fly only if there are empty seats.
+
+A Pod is **BestEffort** if:
+
+* No requests/limits are set.
+
+📌 **Use Case:** Background tasks (logs, batch jobs, demo apps).
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: log-collector
+spec:
+  containers:
+  - name: logger
+    image: mycompany/log-agent:latest
+```
+
+🟢 Runs only if free resources exist
+🟢 Lowest priority
+🟢 First to be killed when node has pressure
+
+---
+
+## 🔍 Checking QoS Class
+
+Run the command:
+
+```bash
+kubectl get pod payment-service -o jsonpath='{.status.qosClass}'
+```
+
+Possible outputs:
+
+* `Guaranteed`
+* `Burstable`
+* `BestEffort`
+
+---
+
+## 🎯 Quick Comparison
+
+| **QoS Class** | **Analogy**                | **Use Case**                        | **Eviction Priority** |
+| ------------- | -------------------------- | ----------------------------------- | --------------------- |
+| ✅ Guaranteed  | Confirmed flight ticket ✈️ | Critical apps (payments, databases) | Last                  |
+| ⚡ Burstable   | Reserved seat in train 🚆  | Web apps, APIs                      | Medium                |
+| 🟢 BestEffort | Standby passenger 🧳       | Logs, batch jobs                    | First                 |
+
+
+---
+
+Would you like me to also **create separate YAML files (`guaranteed.yaml`, `burstable.yaml`, `besteffort.yaml`)** and show how to structure them inside a GitHub repo 📂?
+```
