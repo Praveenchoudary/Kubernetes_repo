@@ -8,11 +8,14 @@ metadata:
 spec:
   tls:
   - hosts:
-    - www.praveens.online
+    - nginx.praveens.online
     - httpd.praveens.online
-    secretName: praveens-tls  # Single TLS secret for both domains
+    - cycle.praveens.online
+    - netflix.praveens.online
+    secretName: praveens-tls  # Single TLS secret for all domains
+
   rules:
-  - host: www.praveens.online
+  - host: nginx.praveens.online
     http:
       paths:
       - path: /
@@ -22,6 +25,7 @@ spec:
             name: nginx
             port:
               number: 80
+
   - host: httpd.praveens.online
     http:
       paths:
@@ -32,3 +36,26 @@ spec:
             name: httpd
             port:
               number: 80
+
+  - host: cycle.praveens.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: cycle
+            port:
+              number: 80
+
+  - host: netflix.praveens.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: net
+            port:
+              number: 80
+
