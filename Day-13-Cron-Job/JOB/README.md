@@ -60,6 +60,7 @@ spec:
    ```sh
    kubectl get jobs
    ```
+<img width="1054" height="116" alt="image" src="https://github.com/user-attachments/assets/bb288da7-8bfd-4c84-9473-10e70a9fc6a7" />
 
 3. Get Pod logs:
 
@@ -82,10 +83,3 @@ The Job will complete and **not run again** unless restarted manually.
 
 ---
 
-
-```
-
----
-
-Do you also want me to extend this README with a **CronJob example** (for scheduled jobs like daily reports), so your repo covers **both Jobs and CronJobs**?
-```
