@@ -117,4 +117,3 @@ kubectl describe hpa
 3. Works with **CPU, Memory, and custom metrics**.
 
 
-Would you like me to also **write the folder structure suggestion** (like `/manifests/deployment.yaml`, `/manifests/service.yaml`, `/manifests/hpa.yaml`) for your GitHub repo 📂 so it looks production-ready?
