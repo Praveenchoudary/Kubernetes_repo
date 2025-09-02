@@ -7,7 +7,7 @@ This guide explains how to implement **Horizontal Pod Autoscaling (HPA)** in Kub
 
 ---
 
-<img width="640" height="444" alt="image" src="https://github.com/user-attachments/assets/f88196d0-3dae-4af2-aa2e-e77af925af99" />
+   <img width="640" height="444" alt="image" src="https://github.com/user-attachments/assets/f88196d0-3dae-4af2-aa2e-e77af925af99" />
 
 
 ## 📌 Prerequisites
