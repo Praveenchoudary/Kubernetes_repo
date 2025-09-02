@@ -1,4 +1,4 @@
-:
+
 ---
 
 # 🚀 Kubernetes Horizontal Pod Autoscaler (HPA)
@@ -100,6 +100,9 @@ kubectl get pods -w
    ```bash
    stress --cpu 2 --timeout 300
    ```
+<img width="1898" height="424" alt="image" src="https://github.com/user-attachments/assets/4545d2df-76ed-4273-bf94-bc440235c805" />
+
+
 
 ⚡ This will increase CPU utilization.
 📈 When CPU usage > **50%**, HPA will **create new pods (up to 5)**.
