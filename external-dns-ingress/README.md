@@ -305,5 +305,3 @@ http://nginx.praveens.online
 
 
 ---
-
-👉 Next, do you also want me to extend this with **HTTPS/TLS using cert-manager + Let’s Encrypt**, so that you get `https://nginx.praveens.online` with automatic certificate renewal?
