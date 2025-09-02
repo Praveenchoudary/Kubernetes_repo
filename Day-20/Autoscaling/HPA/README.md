@@ -134,16 +134,6 @@ kubectl get hpa
 kubectl get pods -w
 ```
 
----
-
-## 🎉 Conclusion
-
-With HPA, your Kubernetes applications **scale automatically based on workload**, ensuring performance and efficiency 🚀.
-
----
-
-Would you like me to also include a **folder structure section** (like `/manifests/deploy.yml` and `/manifests/hpa.yml`) in the README so it looks more GitHub-project friendly?
-
 
 
 
