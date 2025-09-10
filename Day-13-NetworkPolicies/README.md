@@ -32,8 +32,6 @@ Network Policies are implemented using Kubernetes resources that define how pods
 
 - Got it 👍 You want to make a **GitHub README file** that explains **Kubernetes Network Policies** in detail (theory + real-life use cases + real-time examples + implementation steps on EKS with Calico).
 
-Here’s a complete **README.md** draft you can use directly in your repo:
-
 ---
 
 # 🚀 Kubernetes Network Policies with Real-Life Examples
