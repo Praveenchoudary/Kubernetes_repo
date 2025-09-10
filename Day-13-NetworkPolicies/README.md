@@ -210,7 +210,7 @@ kubectl exec -it $FRONTEND_POD -- curl -s $BACKEND_IP
 
 # ❌ Blocked: Random pod → Backend
 kubectl run busybox --rm -it --image=busybox -- /bin/sh
-wget --spider --timeout=1 $BACKEND_IP
+wget --spider --timeout=3 http://BACKEND_IP
 ```
 
 ---
