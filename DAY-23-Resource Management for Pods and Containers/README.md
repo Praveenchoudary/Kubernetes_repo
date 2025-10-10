@@ -208,7 +208,7 @@ spec:
 
 ---
 
-## ✅ **Key Takeaways**
+##  **Key Takeaways**
 
 * **Requests:** Resources guaranteed for the Pod
 * **Limits:** Maximum resources a Pod/container can use
