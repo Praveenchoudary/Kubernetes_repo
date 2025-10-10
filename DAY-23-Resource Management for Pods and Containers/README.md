@@ -7,7 +7,6 @@ This guide covers:
 
 - Resource Quotas
 - Limit Ranges
-- Hands-on examples with real-life scenarios
 
 ---
 
@@ -217,7 +216,4 @@ spec:
 * **LimitRange:** Enforces **default, min, and max values** for Pods and containers
 * Kubernetes prevents Pods from exceeding quotas → Ensures **fair resource allocation**
 
----
 
-Do you want me to do that next?
-```
