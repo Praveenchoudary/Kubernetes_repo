@@ -1,6 +1,6 @@
 
 
-# 🚪 Kubernetes Ingress — Real-Life Example & Setup
+# 🚪 Kubernetes Ingress — Example & Setup
 
 ### 🔹 What is Ingress?
 
