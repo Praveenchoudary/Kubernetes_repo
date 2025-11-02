@@ -302,8 +302,5 @@ DevOps Engineer | Cloud & Kubernetes Enthusiast
 🔗 [LinkedIn](https://www.linkedin.com/in/praveen-chinthala28)
 💻 [GitHub](https://github.com/Praveenchoudary?tab=repositories)
 
----
-
 ## 💙 Happy Kubernetings! 🚀
 
-```
