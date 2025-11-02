@@ -307,8 +307,3 @@ DevOps Engineer | Cloud & Kubernetes Enthusiast
 ## 💙 Happy Kubernetings! 🚀
 
 ```
-
----
-
-They’ll include clean indentation, comments, and filenames at the top for clarity.
-```
