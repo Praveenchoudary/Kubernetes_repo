@@ -1,12 +1,12 @@
 
 # 🚀 Deploying Kong API Gateway on Kubernetes with SSL, Rate Limiting & Authentication
 
-A **production-ready Kong API Gateway** setup on Kubernetes featuring:
+A **production-ready Kong API Gateway** setup on Kubernetes featuring:  
 🌍 **Automatic SSL** via Let’s Encrypt  
 ⚡ **Rate limiting**  
 🔒 **Authentication & Authorization**  
 🔄 **Multiple backend services** (NGINX + Apache)  
-🧱 **Secure HTTPS routing**  
+🧱 **Secure HTTPS routing**
 
 ---
 
@@ -101,7 +101,7 @@ helm install cert-manager jetstack/cert-manager \
 
 ## 📜 Step 4: Create ClusterIssuer
 
-📄 [`kubernetes/02-clusterissuer.yaml`](kubernetes/02-clusterissuer.yaml)
+**File:** `clusterissuer.yaml`
 
 ```yaml
 apiVersion: cert-manager.io/v1
@@ -123,40 +123,57 @@ spec:
 Apply:
 
 ```bash
-kubectl apply -f kubernetes/02-clusterissuer.yaml
+kubectl apply -f clusterissuer.yaml
 ```
 
 ---
 
 ## 🧩 Step 5: Deploy Backend Services
 
-📄 [`kubernetes/03-services.yaml`](kubernetes/03-services.yaml)
+**File:** `services.yaml`
+Creates NGINX and Apache deployments and services.
 
-Creates NGINX and Apache deployments.
+Apply:
+
+```bash
+kubectl apply -f services.yaml
+```
 
 ---
 
 ## 🔏 Step 6: Generate SSL Certificate
 
-📄 [`kubernetes/04-certificate.yaml`](kubernetes/04-certificate.yaml)
+**File:** `certificate.yaml`
+Defines Let’s Encrypt certificate for your domain.
+
+Apply:
+
+```bash
+kubectl apply -f certificate.yaml
+```
 
 ---
 
 ## 🚦 Step 7: Create Kong Ingress with HTTPS Routing
 
-📄 [`kubernetes/05-ingress.yaml`](kubernetes/05-ingress.yaml)
-
+**File:** `ingress.yaml`
 Includes:
 
 * `/cycle` → NGINX
 * `/dm` → Apache
-* TLS using Let’s Encrypt
+* TLS using Let’s Encrypt certificate.
+
+Apply:
+
+```bash
+kubectl apply -f ingress.yaml
+```
 
 ---
 
 ## ⚡ Step 8: Enable Rate Limiting
 
-📄 [`kubernetes/06-ratelimit.yaml`](kubernetes/06-ratelimit.yaml)
+**File:** `ratelimit.yaml`
 
 ```yaml
 apiVersion: configuration.konghq.com/v1
@@ -169,12 +186,20 @@ config:
   policy: local
 ```
 
+Apply:
+
+```bash
+kubectl apply -f ratelimit.yaml
+```
+
 ---
 
 ## 🔑 Step 9: Enable Key Authentication
 
-📄 [`kubernetes/07-key-auth-plugin.yaml`](kubernetes/07-key-auth-plugin.yaml)
-📄 [`kubernetes/08-consumer.yaml`](kubernetes/08-consumer.yaml)
+**Files:**
+
+* `key-auth-plugin.yaml`
+* `consumer.yaml`
 
 Usage:
 
@@ -193,40 +218,64 @@ HTTP/1.1 401 Unauthorized
 
 ## 🧱 Step 10: Configure ACL (Access Control)
 
-📄 [`kubernetes/09-acl-plugin.yaml`](kubernetes/09-acl-plugin.yaml)
-📄 [`kubernetes/10-consumer-group.yaml`](kubernetes/10-consumer-group.yaml)
+**Files:**
+
+* `acl-plugin.yaml`
+* `consumer-group.yaml`
 
 Only consumers in `dev-group` can access.
+
+Apply:
+
+```bash
+kubectl apply -f acl-plugin.yaml
+kubectl apply -f consumer-group.yaml
+```
 
 ---
 
 ## 🔄 Step 11: Per-User Rate Limit
 
-📄 [`kubernetes/11-user-rate-limit.yaml`](kubernetes/11-user-rate-limit.yaml)
+**File:** `user-rate-limit.yaml`
+Different rate limits for each consumer.
 
-Different limits for each consumer.
+Apply:
+
+```bash
+kubectl apply -f user-rate-limit.yaml
+```
 
 ---
 
 ## ⚙️ Step 12: Response Caching
 
-📄 [`kubernetes/12-response-cache.yaml`](kubernetes/12-response-cache.yaml)
-
+**File:** `response-cache.yaml`
 Caches responses in memory for 30s:
 
 * `X-Cache-Status: Miss` → first request
 * `X-Cache-Status: Hit` → subsequent requests
 
+Apply:
+
+```bash
+kubectl apply -f response-cache.yaml
+```
+
 ---
 
 ## 🛡️ Step 13: IP Restriction
 
-📄 [`kubernetes/13-ipblock-plugin.yaml`](kubernetes/13-ipblock-plugin.yaml)
-
+**File:** `ipblock-plugin.yaml`
 Restrict access by IP:
 
 * Deny specific IPs
 * Allow subnets or open ranges
+
+Apply:
+
+```bash
+kubectl apply -f ipblock-plugin.yaml
+```
 
 ---
 
@@ -261,6 +310,5 @@ DevOps Engineer | Cloud & Kubernetes Enthusiast
 
 ---
 
-Would you like me to generate all **YAML files** (`/kubernetes/*.yaml`) with exact code and ready for commit (including file headers, names, and annotations)?  
-If you say **yes**, I’ll give you each file individually (ready to upload to GitHub).
+They’ll include clean indentation, comments, and filenames at the top for clarity.
 ```
