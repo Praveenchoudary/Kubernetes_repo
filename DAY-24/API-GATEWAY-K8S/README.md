@@ -1,107 +1,207 @@
 
-# 🚀 Deploying Kong API Gateway on Kubernetes with SSL, Rate Limiting & Authentication
+---
 
-A **production-ready Kong API Gateway** setup on Kubernetes featuring:  
-🌍 **Automatic SSL** via Let’s Encrypt  
-⚡ **Rate limiting**  
-🔒 **Authentication & Authorization**  
-🔄 **Multiple backend services** (NGINX + Apache)  
-🧱 **Secure HTTPS routing**
+# 🚀 Kubernetes Gateway API with Envoy Gateway
+
+### Production-Ready Implementation on E2E Kubernetes Cluster
 
 ---
 
-## 🧩 What Is an API Gateway?
+## 📌 Overview
 
-An API Gateway acts as the single entry point for all client requests to your backend microservices — securely routing, authenticating, and monitoring API traffic.
+As Kubernetes workloads grow in scale and complexity, the traditional **Ingress** model becomes difficult to manage and unsafe for multi-team environments.
 
-Think of it as your API’s **traffic manager**.
+To solve these challenges, Kubernetes introduced the **Gateway API**, a modern, extensible, and role-oriented networking API.
 
-### 💡 Example
-
-When you open a food delivery app:
-- 🧾 User Service handles login  
-- 🍔 Menu Service lists restaurants  
-- 💳 Payment Service manages checkout  
-- 🚴 Delivery Service tracks orders  
-
-Instead of exposing all APIs directly, **Kong Gateway**:
-✅ Authenticates users  
-✅ Enforces rate limits  
-✅ Routes to correct backend services  
-✅ Adds SSL & observability  
+This repository demonstrates a **complete, production-grade Gateway API setup** using **Envoy Gateway** on an **E2E Kubernetes Cluster**.
 
 ---
 
-## ⚙️ Prerequisites
+## 🎯 What This Guide Covers
 
-Ensure you have:
-- ✅ A running Kubernetes cluster (EKS, Kops, Minikube, etc.)
-- ✅ `kubectl` & `helm` installed
-- ✅ A domain (e.g. `testkong.praveens.online`)
-- ✅ DNS managed via **AWS Route 53**
+* Gateway API fundamentals
+* North–South vs East–West traffic
+* Envoy Gateway installation
+* HTTP & HTTPS Gateway
+* TLS automation using cert-manager + Let’s Encrypt
+* Host-based routing
+* URL rewrite
+* Traffic splitting (50/50)
+* Weighted canary deployment (80/20)
 
 ---
 
-## 🧱 Step 1: Install Kong via Helm
+## 🚦 Traffic Types in Kubernetes
+
+### 🌍 North–South Traffic
+
+Traffic entering or leaving the cluster.
+
+**Examples**
+
+* Browser accessing a website
+* External API calls
+
+👉 Handled by **Ingress / Gateway API**
+
+---
+
+### 🔁 East–West Traffic
+
+Traffic within the cluster.
+
+**Examples**
+
+* Frontend → Backend
+* Order → Payment service
+
+👉 Handled by **Service Mesh**
+
+> ⚠️ Gateway API is **not** for internal service-to-service traffic.
+
+---
+
+## 🧱 Gateway API Core Components
+
+| Component    | Purpose                        | Managed By    |
+| ------------ | ------------------------------ | ------------- |
+| GatewayClass | Selects gateway implementation | Platform Team |
+| Gateway      | Entry point (ports, TLS)       | Platform/Ops  |
+| HTTPRoute    | Routing rules                  | App Team      |
+
+---
+
+## 🛠 Prerequisites
+
+* Kubernetes cluster (E2E)
+* `kubectl` configured
+* Helm installed
+  [https://helm.sh/docs/intro/install/](https://helm.sh/docs/intro/install/)
+* Public domain name (GoDaddy used here)
+
+---
+
+## 🪜 Step-by-Step Implementation
+
+---
+
+## 🔹 Step 1: Create Kubernetes Cluster on E2E
+
+Create a Kubernetes cluster using the **E2E Cloud Console**.
+
+---
+
+## 🔹 Step 2: Install Gateway API CRDs
 
 ```bash
-helm repo add kong https://charts.konghq.com
-helm repo update
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml
+```
 
-kubectl create namespace kong
-
-helm install kong kong/kong \
-  --namespace kong \
-  --set ingressController.installCRDs=false
-````
-
-Check pods:
+Verify:
 
 ```bash
-kubectl get pods -n kong
+kubectl get crds | grep gateway
 ```
 
 ---
 
-## 🌐 Step 2: Map Domain (Route 53)
-
-1. Get Kong LoadBalancer external IP:
-
-   ```bash
-   kubectl get svc -n kong
-   ```
-2. Create a Route 53 **A Record (Alias)** pointing to that LoadBalancer:
-
-   ```
-   Name: testkong
-   Type: A (Alias)
-   Target: <ELB DNS>
-   ```
-3. Verify DNS:
-
-   ```bash
-   nslookup testkong.praveens.online
-   ```
-
----
-
-## 🔐 Step 3: Install Cert-Manager
+## 🔹 Step 3: Install Envoy Gateway Controller
 
 ```bash
-helm repo add jetstack https://charts.jetstack.io
-helm repo update
+helm install eg oci://docker.io/envoyproxy/gateway-helm \
+  --version v1.6.1 \
+  -n envoy-gateway-system \
+  --create-namespace
+```
 
-helm install cert-manager jetstack/cert-manager \
-  --namespace cert-manager \
-  --create-namespace \
-  --set installCRDs=true
+Wait for readiness:
+
+```bash
+kubectl wait --timeout=5m -n envoy-gateway-system \
+deployment/envoy-gateway --for=condition=Available
 ```
 
 ---
 
-## 📜 Step 4: Create ClusterIssuer
+## 🔹 Step 4: Create GatewayClass
 
-**File:** `clusterissuer.yaml`
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy-gateway-class
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+```
+
+```bash
+kubectl apply -f gatewayclass.yaml
+```
+
+---
+
+## 🔹 Step 5: Create Gateway (HTTP + HTTPS)
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: api-gateway
+spec:
+  gatewayClassName: envoy-gateway-class
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+    - name: https
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: apigateway-tls
+```
+
+```bash
+kubectl apply -f gateway.yaml
+kubectl get gateway api-gateway
+```
+
+---
+
+## 🌐 Step 6: Domain Mapping (GoDaddy)
+
+Create an **A record**:
+
+| Field | Value                   |
+| ----- | ----------------------- |
+| Name  | apigateway              |
+| Type  | A                       |
+| Value | `<Gateway External IP>` |
+
+Verify:
+
+```bash
+dig apigateway.praveens.online
+```
+
+---
+
+## 🔐 Step 7: Install cert-manager
+
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.yaml
+```
+
+Verify:
+
+```bash
+kubectl get pods -n cert-manager
+```
+
+---
+
+## 🔑 Step 8: Configure Let’s Encrypt ClusterIssuer
 
 ```yaml
 apiVersion: cert-manager.io/v1
@@ -110,197 +210,176 @@ metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    email: itsmepraveen8140@gmail.com
+    email: admin@praveens.online
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: letsencrypt-prod
+      name: letsencrypt-prod-key
     solvers:
       - http01:
-          ingress:
-            class: kong
-```
-
-Apply:
-
-```bash
-kubectl apply -f clusterissuer.yaml
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: api-gateway
 ```
 
 ---
 
-## 🧩 Step 5: Deploy Backend Services
-
-**File:** `services.yaml`
-Creates NGINX and Apache deployments and services.
-
-Apply:
-
-```bash
-kubectl apply -f services.yaml
-```
-
----
-
-## 🔏 Step 6: Generate SSL Certificate
-
-**File:** `certificate.yaml`
-Defines Let’s Encrypt certificate for your domain.
-
-Apply:
-
-```bash
-kubectl apply -f certificate.yaml
-```
-
----
-
-## 🚦 Step 7: Create Kong Ingress with HTTPS Routing
-
-**File:** `ingress.yaml`
-Includes:
-
-* `/cycle` → NGINX
-* `/dm` → Apache
-* TLS using Let’s Encrypt certificate.
-
-Apply:
-
-```bash
-kubectl apply -f ingress.yaml
-```
-
----
-
-## ⚡ Step 8: Enable Rate Limiting
-
-**File:** `ratelimit.yaml`
+## 📜 Step 9: Request TLS Certificate
 
 ```yaml
-apiVersion: configuration.konghq.com/v1
-kind: KongPlugin
+apiVersion: cert-manager.io/v1
+kind: Certificate
 metadata:
-  name: echo-rate-limit
-plugin: rate-limiting
-config:
-  minute: 5
-  policy: local
-```
-
-Apply:
-
-```bash
-kubectl apply -f ratelimit.yaml
+  name: apigateway-cert
+spec:
+  secretName: apigateway-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - apigateway.praveens.online
 ```
 
 ---
 
-## 🔑 Step 9: Enable Key Authentication
-
-**Files:**
-
-* `key-auth-plugin.yaml`
-* `consumer.yaml`
-
-Usage:
-
-```bash
-curl -H "apikey: dev-api-key-12345" https://testkong.praveens.online/cycle
-```
-
-Unauthorized (no key):
-
-```bash
-HTTP/1.1 401 Unauthorized
-{"message":"No API key found in request"}
-```
+## 🚀 Step 10: Routing Examples
 
 ---
 
-## 🧱 Step 10: Configure ACL (Access Control)
+### 🌍 Host-Based Routing
 
-**Files:**
-
-* `acl-plugin.yaml`
-* `consumer-group.yaml`
-
-Only consumers in `dev-group` can access.
-
-Apply:
-
-```bash
-kubectl apply -f acl-plugin.yaml
-kubectl apply -f consumer-group.yaml
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: host-route
+spec:
+  parentRefs:
+    - name: api-gateway
+  hostnames:
+    - apigateway.praveens.online
+  rules:
+    - backendRefs:
+        - name: backend-1
+          port: 80
 ```
 
 ---
 
-## 🔄 Step 11: Per-User Rate Limit
+### 🔁 URL Rewrite (`/app → /`)
 
-**File:** `user-rate-limit.yaml`
-Different rate limits for each consumer.
-
-Apply:
-
-```bash
-kubectl apply -f user-rate-limit.yaml
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: rewrite-example
+spec:
+  parentRefs:
+    - name: api-gateway
+  hostnames:
+    - apigateway.praveens.online
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /app
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: backend-1
+          port: 80
 ```
 
 ---
 
-## ⚙️ Step 12: Response Caching
+### ⚖️ Traffic Splitting (50/50)
 
-**File:** `response-cache.yaml`
-Caches responses in memory for 30s:
-
-* `X-Cache-Status: Miss` → first request
-* `X-Cache-Status: Hit` → subsequent requests
-
-Apply:
-
-```bash
-kubectl apply -f response-cache.yaml
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: traffic-splitting
+spec:
+  parentRefs:
+    - name: api-gateway
+  hostnames:
+    - apigateway.praveens.online
+  rules:
+    - backendRefs:
+        - name: backend-1
+          port: 80
+        - name: backend-2
+          port: 80
 ```
 
 ---
 
-## 🛡️ Step 13: IP Restriction
+### 🐤 Weighted Canary Deployment (80/20)
 
-**File:** `ipblock-plugin.yaml`
-Restrict access by IP:
-
-* Deny specific IPs
-* Allow subnets or open ranges
-
-Apply:
-
-```bash
-kubectl apply -f ipblock-plugin.yaml
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: weighted-canary
+spec:
+  parentRefs:
+    - name: api-gateway
+  hostnames:
+    - apigateway.praveens.online
+  rules:
+    - backendRefs:
+        - name: backend-1
+          port: 80
+          weight: 80
+        - name: backend-2
+          port: 80
+          weight: 20
 ```
 
 ---
 
-## ✅ Step 14: Verification Checklist
+## 🧪 Browser Verification
 
-| Feature            | Test                                           | Expected Result          |
-| ------------------ | ---------------------------------------------- | ------------------------ |
-| 🔒 SSL             | Visit `https://testkong.praveens.online/cycle` | Valid Let’s Encrypt cert |
-| ⚡ Rate Limit       | Send >5 requests/min                           | `429 Too Many Requests`  |
-| 🔑 Auth            | No API key                                     | `401 Unauthorized`       |
-| 🧩 ACL             | Unauthorized group                             | `403 Forbidden`          |
-| 🛡️ IP Restriction | Blocked IP                                     | `403 Forbidden`          |
-| 🚀 Caching         | Repeat request                                 | `X-Cache-Status: Hit`    |
+Open:
+
+```
+https://apigateway.praveens.online
+```
+
+Refresh 20–30 times:
+
+* Mostly → backend-1
+* Occasionally → backend-2
+
+✅ Canary deployment confirmed
 
 ---
 
-## 👨‍💻 Author
+## ✨ Additional Gateway API Features
 
-**Praveen Chinthala**
-DevOps Engineer | Cloud & Kubernetes Enthusiast
+* Header-based routing
+* Request mirroring
+* Rate limiting
+* TCP / UDP routing
 
-💡 Passionate about building secure, scalable infra using Docker, Kubernetes, and AWS.
+📘 Reference:
+[https://gateway.envoyproxy.io/docs/tasks/traffic/](https://gateway.envoyproxy.io/docs/tasks/traffic/)
 
-🔗 [LinkedIn](https://www.linkedin.com/in/praveen-chinthala28)
-💻 [GitHub](https://github.com/Praveenchoudary?tab=repositories)
+---
 
-## 💙 Happy Kubernetings! 🚀
+## 🏁 Conclusion
+
+Gateway API provides:
+
+* Clear role separation
+* Safer production networking
+* Advanced traffic control
+* Controller-agnostic behavior
+
+🚀 **Recommended replacement for Ingress in modern Kubernetes environments**
+
+---
 
