@@ -3,10 +3,6 @@
 
 # 🚀 MetalLB with Helm on Kubernetes (Layer 2 Mode)
 
-![MetalLB](https://img.shields.io/badge/MetalLB-0099FF?style=for-the-badge\&logoColor=white)
-![Helm](https://img.shields.io/badge/Helm-0F172A?style=for-the-badge\&logo=helm\&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge\&logo=kubernetes\&logoColor=white)
-![Vagrant](https://img.shields.io/badge/Vagrant-1563FF?style=for-the-badge\&logo=vagrant\&logoColor=white)
 
 This repository provides a **complete step-by-step guide** to install and configure **MetalLB** in a Kubernetes cluster running on **on-premise**, **bare-metal**, or **local VM** environments using **Helm**.
 
