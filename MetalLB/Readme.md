@@ -32,7 +32,7 @@ It also demonstrates:
 
 # 📘 Introduction
 
-In cloud platforms like AWS, Azure, or GCP, Kubernetes automatically provisions external load balancers.
+In cloud platforms like AWS, Azure, or GCP,E2E Kubernetes automatically provisions external load balancers.
 
 However, in **bare-metal** or **on-premise** environments:
 
