@@ -1,29 +1,42 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: exec-deployment
+  name: redis-deployment
+  namespace: redis-db
 spec:
+  # Run one Pod
   replicas: 1
+  # Deployment manages Pods with this label
   selector:
     matchLabels:
-      app: exec-app
+      app: redis
+  # Pod template
   template:
     metadata:
       labels:
-        app: exec-app
+        app: redis
     spec:
       containers:
-      - name: exec-app
-        image: busybox
-        args:
-        - /bin/sh
-        - -c
-        - |
-          touch /tmp/healthy; sleep 10; rm -f /tmp/healthy; sleep 600
+      - name: redis
+        # Redis Docker image
+        image: redis:7
+        # Redis listens on port 6379
+        ports:
+        - containerPort: 6379
+        # Liveness Probe
         livenessProbe:
+          # Run this command inside the container
           exec:
             command:
-            - cat
-            - /tmp/healthy
-          initialDelaySeconds: 5
-          periodSeconds: 10
+            - redis-cli
+            - -p
+            - "6380"      # Wrong port (Redis actually runs on 6379)
+            - ping
+          # Wait 10 seconds before first probe
+          initialDelaySeconds: 10
+          # Check every 5 seconds
+          periodSeconds: 5
+          # Wait up to 2 seconds for the command to complete
+          timeoutSeconds: 2
+          # Restart container after 3 consecutive failures
+          failureThreshold: 3
